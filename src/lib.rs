@@ -33,19 +33,19 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
     };
 
     
-    for line in results {
-        println!("{line}");
+    for (n, line) in results {
+        println!("{}: {}", n+1, line);
     }
 
     Ok(())
 }
 
-pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<(usize, &'a str)> {
     let mut results = Vec::new();
 
-    for line in contents.lines() {
+    for (n, line) in contents.lines().enumerate() {
         if line.contains(query) {
-            results.push(line);
+            results.push((n, line));
         }
     }
 
@@ -55,13 +55,13 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 pub fn search_case_insensitive<'a>(
     query: &str,
     contents: &'a str,
-) -> Vec<&'a str> {
+) -> Vec<(usize, &'a str)> {
     let query = query.to_lowercase();
     let mut results = Vec::new();
 
-    for line in contents.lines() {
+    for (n, line) in contents.lines().enumerate() {
         if line.to_lowercase().contains(&query) {
-            results.push(line);
+            results.push((n, line));
         }
     }
 
@@ -82,7 +82,7 @@ safe, fast, productive.
 Pick three.
 Duct tape.";
 
-        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+        assert_eq!(vec![(1, "safe, fast, productive.")], search(query, contents));
     }
 
     #[test]
@@ -95,7 +95,7 @@ Pick three.
 Trust me.";
 
         assert_eq!(
-            vec!["Rust:", "Trust me."],
+            vec![(0, "Rust:"), (3, "Trust me.")],
             search_case_insensitive(query, contents)
         );
     }
